@@ -38,6 +38,8 @@ public class GameController {
         }
     }
 
+
+
     private void updateBullets() {
         List<Missile> toRemove = new ArrayList<>();
 
@@ -78,38 +80,30 @@ public class GameController {
     private void checkCollisions() {
         List<Missile> toRemove = new ArrayList<>();
 
-        // Check collisions for all missiles
         for (Missile missile : missiles) {
             // Collision with enemy tanks
-            for (Tank enemy : enemyTanks) {
-                if (missile.getImageView().getBoundsInParent().intersects(enemy.getImageView().getBoundsInParent())) {
-                    enemy.takeDamage(25); // Damage the enemy tank
-                    if (!enemy.isAlive()) {
-                        gamePane.getChildren().remove(enemy.getImageView()); // Remove destroyed tank
+            if (missile.getType().equals("player")) {
+                for (Tank enemy : enemyTanks) {
+                    if (missile.getImageView().getBoundsInParent().intersects(enemy.getImageView().getBoundsInParent())) {
+                        enemy.takeDamage(25); // Damage enemy
+                        if (!enemy.isAlive()) {
+                            Explosion explosion = new Explosion(
+                                    enemy.getImageView().getX(), enemy.getImageView().getY()
+                            );
+                            gamePane.getChildren().add(explosion.getImageView());
+                            explosion.play(); // Trigger explosion animation
+                            gamePane.getChildren().remove(enemy.getImageView());
+                        }
+                        toRemove.add(missile); // Remove the missile
                     }
-                    toRemove.add(missile); // Remove the missile
                 }
-            }
-
-            // Collision with walls
-            for (Wall wall : walls) {
-                if (missile.getImageView().getBoundsInParent().intersects(wall.getImageView().getBoundsInParent())) {
-                    toRemove.add(missile); // Remove missile when it hits a wall
-                }
-            }
-
-            // (Optional) Collision with player tank for enemy missiles
-            if (!missile.getType().equals("player") && missile.getImageView().getBoundsInParent()
-                    .intersects(playerTank.getImageView().getBoundsInParent())) {
-                playerTank.takeDamage(25); // Damage the player tank
-                toRemove.add(missile); // Remove the missile
             }
         }
 
-        // Remove missiles that collided
         missiles.removeAll(toRemove);
         gamePane.getChildren().removeAll(toRemove.stream().map(Missile::getImageView).toList());
     }
+
 
     private void checkGameStatus() {
         // Check if the player has won
