@@ -1,4 +1,4 @@
-package edu.tcu.cs.tankbattle.models;
+package edu.tcu.cs.tankbattle.game_elements;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

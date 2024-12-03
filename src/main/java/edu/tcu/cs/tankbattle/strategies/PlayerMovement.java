@@ -1,6 +1,6 @@
 package edu.tcu.cs.tankbattle.strategies;
 
-import edu.tcu.cs.tankbattle.models.Tank;
+import edu.tcu.cs.tankbattle.game_elements.Tank;
 
 public class PlayerMovement implements MovementStrategy {
     @Override

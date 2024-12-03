@@ -1,8 +1,7 @@
-package edu.tcu.cs.tankbattle;
+package edu.tcu.cs.tankbattle.game_main;
 
-import edu.tcu.cs.tankbattle.controllers.GameController;
-import edu.tcu.cs.tankbattle.models.Direction;
-import edu.tcu.cs.tankbattle.models.Tank;
+import edu.tcu.cs.tankbattle.game_elements.Direction;
+import edu.tcu.cs.tankbattle.game_elements.Tank;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;

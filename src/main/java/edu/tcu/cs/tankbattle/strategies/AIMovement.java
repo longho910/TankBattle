@@ -1,7 +1,7 @@
 package edu.tcu.cs.tankbattle.strategies;
 
-import edu.tcu.cs.tankbattle.models.Direction;
-import edu.tcu.cs.tankbattle.models.Tank;
+import edu.tcu.cs.tankbattle.game_elements.Direction;
+import edu.tcu.cs.tankbattle.game_elements.Tank;
 
 import java.util.Random;
 

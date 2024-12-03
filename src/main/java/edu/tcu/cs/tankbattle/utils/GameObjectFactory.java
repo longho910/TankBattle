@@ -1,6 +1,6 @@
-package edu.tcu.cs.tankbattle.factories;
+package edu.tcu.cs.tankbattle.utils;
 
-import edu.tcu.cs.tankbattle.models.*;
+import edu.tcu.cs.tankbattle.game_elements.*;
 import edu.tcu.cs.tankbattle.strategies.AIMovement;
 import edu.tcu.cs.tankbattle.strategies.PlayerMovement;
 
@@ -9,6 +9,7 @@ public class GameObjectFactory {
         if (type.equals("player")) {
             return new Tank("/images/HtankD.gif","player", 100, new PlayerMovement(), x, y);
         } else if (type.equals("enemy")) {
+
             return new Tank("/images/HtankD2.gif", "enemy", 50, new AIMovement(), x, y);
         }
         return null;

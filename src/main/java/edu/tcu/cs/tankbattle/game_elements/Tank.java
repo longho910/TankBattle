@@ -1,4 +1,4 @@
-package edu.tcu.cs.tankbattle.models;
+package edu.tcu.cs.tankbattle.game_elements;
 
 import edu.tcu.cs.tankbattle.strategies.MovementStrategy;
 import javafx.scene.image.Image;
@@ -21,7 +21,7 @@ public class Tank {
         this.imageView.setY(startY);
         this.health = health;
         this.movementStrategy = movementStrategy;
-        this.speed = 8; // Default speed multiplier
+        this.speed = 10; // Default speed multiplier
         this.direction = Direction.UP; // Default direction
         this.type = type; // Type of tank (player or enemy)
     }

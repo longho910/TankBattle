@@ -1,4 +1,4 @@
-package edu.tcu.cs.tankbattle.models;
+package edu.tcu.cs.tankbattle.game_elements;
 
 public enum Direction {
     UP, DOWN, LEFT, RIGHT
