@@ -9,8 +9,10 @@ public class AIMovement implements MovementStrategy {
 
     @Override
     public void move(Tank tank, double dx, double dy) {
-        int randomSpeedFactor = random.nextInt(3) + 1; // Randomize AI speed
-        tank.getImageView().setX(tank.getImageView().getX() + dx * randomSpeedFactor);
-        tank.getImageView().setY(tank.getImageView().getY() + dy * randomSpeedFactor);
+        // Randomize movement direction
+        double randomX = random.nextInt(3) - 1; // -1, 0, 1
+        double randomY = random.nextInt(3) - 1; // -1, 0, 1
+        tank.getImageView().setX(tank.getImageView().getX() + randomX * tank.getSpeed());
+        tank.getImageView().setY(tank.getImageView().getY() + randomY * tank.getSpeed());
     }
 }
