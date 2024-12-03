@@ -17,6 +17,8 @@ public class GameController {
     private List<Missile> missiles = new ArrayList<>();
     private List<Wall> walls = new ArrayList<>();
     private List<MedPack> medPacks = new ArrayList<>();
+    private boolean gameStarted = false;
+
 
     public GameController(Pane gamePane) {
         this.gamePane = gamePane;
@@ -31,36 +33,17 @@ public class GameController {
         gamePane.getChildren().add(background);
 
         // Initialize player tank
-        playerTank = GameObjectFactory.createTank("player", 400, 500);
+        playerTank = GameObjectFactory.createTank("player", 5, 5);
         gamePane.getChildren().add(playerTank.getImageView());
 
-        // Create sample enemies and walls for the map
-        createMap();
+        // Initialization logic
+        GameMap gameMap = new GameMap();
+        gameMap.createMap(gamePane, walls, enemyTanks);
 
+        // Mark the game as started only after initialization
+        gameStarted = true;
     }
-    private void createMap() {
-        // Add enemies
-        for (int i = 0; i < 3; i++) {
-            Tank enemyTank = GameObjectFactory.createTank("enemy", 100 + i * 200, 100);
-            enemyTank.setSpeed(2);
-            enemyTanks.add(enemyTank);
-            gamePane.getChildren().add(enemyTank.getImageView());
-        }
 
-        // Add destroyable walls
-        for (int i = 0; i < 5; i++) {
-            Wall commonWall = GameObjectFactory.createCommonWall(200 + i * 50, 300);
-            walls.add(commonWall);
-            gamePane.getChildren().add(commonWall.getImageView());
-        }
-
-        // Add indestructible metal walls
-        for (int i = 0; i < 3; i++) {
-            Wall metalWall = GameObjectFactory.createMetalWall(100 + i * 100, 400);
-            walls.add(metalWall);
-            gamePane.getChildren().add(metalWall.getImageView());
-        }
-    }
 
 
     private void updateBullets() {
@@ -160,6 +143,8 @@ public class GameController {
 
 
     private void checkGameStatus() {
+        if (!gameStarted) return; // Skip checking status until the game has started
+
         // Check if the player has won
         if (enemyTanks.isEmpty()) {
             System.out.println("You Win!");

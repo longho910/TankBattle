@@ -32,4 +32,13 @@ public class GameObjectFactory {
     public static MedPack createMedPack(double x, double y) {
         return new MedPack("/images/hp.png", x, y);
     }
+
+    public static River createRiver(double x, double y) {
+        return new River("/images/river.jpg", x, y);
+    }
+
+    public static Tree createTree(double x, double y) {
+        return new Tree("/images/tree.gif", x, y);
+    }
+
 }
