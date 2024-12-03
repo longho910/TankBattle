@@ -7,16 +7,21 @@ import edu.tcu.cs.tankbattle.strategies.PlayerMovement;
 public class GameObjectFactory {
     public static Tank createTank(String type, double x, double y) {
         if (type.equals("player")) {
-            return new Tank("/images/HtankD.gif", 100, new PlayerMovement(), x, y);
+            return new Tank("/images/HtankD.gif","player", 100, new PlayerMovement(), x, y);
         } else if (type.equals("enemy")) {
-            return new Tank("/images/HtankD2.gif", 50, new AIMovement(), x, y);
+            return new Tank("/images/HtankD2.gif", "enemy", 50, new AIMovement(), x, y);
         }
         return null;
     }
 
-    public static Wall createWall(double x, double y) {
-        return new Wall("/images/commonWall.gif", x, y);
+    public static Wall createCommonWall(double x, double y) {
+        return new Wall("/images/commonWall.gif", true, x, y);
     }
+
+    public static Wall createMetalWall(double x, double y) {
+        return new Wall("/images/metalWall.gif", false, x, y);
+    }
+
 
     public static Missile createMissile(String type, double x, double y) {
         String imagePath = "/images/bulletD.gif";

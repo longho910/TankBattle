@@ -27,14 +27,23 @@ public class GameController {
 
         for (int i = 0; i < 3; i++) {
             Tank enemyTank = GameObjectFactory.createTank("enemy", 100 + i * 200, 100);
+            enemyTank.setSpeed(2); // Match player speed
             enemyTanks.add(enemyTank);
             gamePane.getChildren().add(enemyTank.getImageView());
         }
 
+        // Add common walls
         for (int i = 0; i < 5; i++) {
-            Wall wall = GameObjectFactory.createWall(200 + i * 100, 300);
-            walls.add(wall);
-            gamePane.getChildren().add(wall.getImageView());
+            Wall commonWall = GameObjectFactory.createCommonWall(100 + i * 50, 300);
+            walls.add(commonWall);
+            gamePane.getChildren().add(commonWall.getImageView());
+        }
+
+        // Add metal walls
+        for (int i = 0; i < 5; i++) {
+            Wall metalWall = GameObjectFactory.createMetalWall(200 + i * 50, 400);
+            walls.add(metalWall);
+            gamePane.getChildren().add(metalWall.getImageView());
         }
     }
 
@@ -73,9 +82,10 @@ public class GameController {
 
     private void updateEnemyMovement() {
         for (Tank enemy : enemyTanks) {
-            enemy.move(1, 0); // Move horizontally or customize movement
+            enemy.move(0, 0); // Movement is handled by AIMovement strategy
         }
     }
+
 
     private void checkCollisions() {
         List<Missile> toRemove = new ArrayList<>();
@@ -98,7 +108,21 @@ public class GameController {
                     }
                 }
             }
+
+            // Collision with walls
+            for (Wall wall : walls) {
+                if (missile.getImageView().getBoundsInParent().intersects(wall.getImageView().getBoundsInParent())) {
+                    if (wall.isDestroyable()) {
+                        gamePane.getChildren().remove(wall.getImageView()); // Remove destroyable wall
+                        walls.remove(wall);
+                    }
+                    toRemove.add(missile); // Remove missile
+                    break;
+                }
+            }
         }
+
+
 
         missiles.removeAll(toRemove);
         gamePane.getChildren().removeAll(toRemove.stream().map(Missile::getImageView).toList());

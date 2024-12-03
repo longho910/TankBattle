@@ -10,16 +10,20 @@ public class Tank {
     private MovementStrategy movementStrategy;
     private int speed;
     private Direction direction; // Current direction of the tank
+    private String type; // "player" or "enemy"
 
 
-    public Tank(String imagePath, int health, MovementStrategy movementStrategy, double startX, double startY) {
+
+
+    public Tank(String imagePath, String type, int health, MovementStrategy movementStrategy, double startX, double startY) {
         this.imageView = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
         this.imageView.setX(startX);
         this.imageView.setY(startY);
         this.health = health;
         this.movementStrategy = movementStrategy;
-        this.speed = 5; // Default speed multiplier
+        this.speed = 8; // Default speed multiplier
         this.direction = Direction.UP; // Default direction
+        this.type = type; // Type of tank (player or enemy)
     }
 
     public void move(double dx, double dy) {
@@ -28,12 +32,13 @@ public class Tank {
 
     public void setDirection(Direction direction) {
         this.direction = direction;
-        // Update the tank image based on the direction
+        // Update the tank image based on the direction and type
+        String suffix = type.equals("enemy") ? "2.gif" : ".gif"; // Enemy tanks have "2.gif"
         String imagePath = switch (direction) {
-            case UP -> "/images/HtankU.gif";
-            case DOWN -> "/images/HtankD.gif";
-            case LEFT -> "/images/HtankL.gif";
-            case RIGHT -> "/images/HtankR.gif";
+            case UP -> "/images/HtankU" + suffix;
+            case DOWN -> "/images/HtankD" + suffix;
+            case LEFT -> "/images/HtankL" + suffix;
+            case RIGHT -> "/images/HtankR" + suffix;
         };
         this.imageView.setImage(new Image(getClass().getResource(imagePath).toExternalForm()));
     }
