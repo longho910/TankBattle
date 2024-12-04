@@ -172,6 +172,29 @@ public class GameController {
     }
 
     public void shootBullet(double startX, double startY, Direction direction) {
+        double tankWidth = playerTank.getImageView().getFitWidth();
+        double tankHeight = playerTank.getImageView().getFitHeight();
+
+        // Adjust bullet starting position based on tank center and direction
+        switch (direction) {
+            case UP -> {
+                startX = playerTank.getImageView().getX() + tankWidth / 2 - 5; // Center X
+                startY = playerTank.getImageView().getY(); // Top edge
+            }
+            case DOWN -> {
+                startX = playerTank.getImageView().getX() + tankWidth / 2 - 5; // Center X
+                startY = playerTank.getImageView().getY() + tankHeight; // Bottom edge
+            }
+            case LEFT -> {
+                startX = playerTank.getImageView().getX(); // Left edge
+                startY = playerTank.getImageView().getY() + tankHeight / 2 - 5; // Center Y
+            }
+            case RIGHT -> {
+                startX = playerTank.getImageView().getX() + tankWidth; // Right edge
+                startY = playerTank.getImageView().getY() + tankHeight / 2 - 5; // Center Y
+            }
+        }
+
         // Select the correct bullet image based on direction
         String bulletImagePath = switch (direction) {
             case UP -> "/images/bulletU.gif";
@@ -195,6 +218,7 @@ public class GameController {
         missiles.add(missile);
         gamePane.getChildren().add(missile.getImageView());
     }
+
 
 
 
