@@ -38,14 +38,14 @@ public class Main extends Application {
                 }
                 case SPACE -> {
                     controller.shootBullet(
-                            playerTank.getDirection()
+                            playerTank
                     );
                 }
             }
         });
 
 
-              primaryStage.setScene(scene);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Tank Battle Game");
         primaryStage.show();
     }

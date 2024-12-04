@@ -1,6 +1,7 @@
 package edu.tcu.cs.tankbattle.game_main;
 
 import edu.tcu.cs.tankbattle.game_elements.*;
+import edu.tcu.cs.tankbattle.strategies.AIMovement;
 import edu.tcu.cs.tankbattle.utils.GameObjectFactory;
 import javafx.animation.AnimationTimer;
 import javafx.scene.image.ImageView;
@@ -79,43 +80,35 @@ public class GameController {
 
     private void updateEnemyMovement() {
         for (Tank enemy : enemyTanks) {
-            double dx = 0, dy = 0;
-            boolean moved = false;
+            AIMovement aiMovement = (AIMovement) enemy.getMovementStrategy(); // Ensure AIMovement is used
+            double originalX = enemy.getImageView().getX();
+            double originalY = enemy.getImageView().getY();
 
-            while (!moved) {
-                switch (enemy.getDirection()) {
-                    case UP -> dy = -1;
-                    case DOWN -> dy = 1;
-                    case LEFT -> dx = -1;
-                    case RIGHT -> dx = 1;
-                }
+            // Execute movement using AIMovement
+            aiMovement.move(enemy, 0, 0);
 
-                // Try to move the enemy tank and check for collisions
-                double nextX = enemy.getImageView().getX() + dx * enemy.getSpeed();
-                double nextY = enemy.getImageView().getY() + dy * enemy.getSpeed();
-                boolean collides = walls.stream().anyMatch(wall ->
-                        wall.getImageView().getBoundsInParent().intersects(
-                                nextX, nextY, enemy.getImageView().getFitWidth(), enemy.getImageView().getFitHeight()
-                        ));
+            // Check for collisions after movement
+            boolean collides = walls.stream().anyMatch(wall ->
+                    wall.getImageView().getBoundsInParent().intersects(
+                            enemy.getImageView().getBoundsInParent()
+                    ));
 
-                if (!collides) {
-                    enemy.move(dx, dy, walls);
-                    moved = true;
-                } else {
-                    // If collision occurs, change direction randomly
-                    Direction newDirection = Direction.values()[(int) (Math.random() * Direction.values().length)];
-                    enemy.setDirection(newDirection);
-                    dx = 0;
-                    dy = 0; // Reset movement deltas
-                }
+            // Revert movement if collision occurs
+            if (collides) {
+                enemy.getImageView().setX(originalX);
+                enemy.getImageView().setY(originalY);
+                // Change direction to avoid collision
+                Direction newDirection = Direction.values()[(int) (Math.random() * Direction.values().length)];
+                enemy.setDirection(newDirection);
             }
 
             // Randomly decide to shoot
-            if (Math.random() < 0.05) { // 5% chance to shoot each frame
-                shootBullet(enemy.getDirection());
+            if (Math.random() < 0.02) { // 2% chance to shoot each frame
+                shootBullet(enemy);
             }
         }
     }
+
 
 
     private void handleExplosion(double x, double y, ImageView target, boolean isEnemy) {
@@ -153,6 +146,19 @@ public class GameController {
                         }
                         toRemove.add(missile); // Remove missile
                         break; // Stop checking other enemies for this missile
+                    }
+                }
+            }
+
+            // Collision with player (enemy's missiles)
+            if (missile.getType().equals("enemy")) {
+                if (missile.getImageView().getBoundsInParent().intersects(playerTank.getImageView().getBoundsInParent())) {
+                    playerTank.takeDamage(25);
+                    toRemove.add(missile); // Remove missile
+                    if (!playerTank.isAlive()) {
+                        gamePane.getChildren().remove(playerTank.getImageView()); // Remove player tank from game pane
+                        System.out.println("Game Over!");
+                        stopGame();
                     }
                 }
             }

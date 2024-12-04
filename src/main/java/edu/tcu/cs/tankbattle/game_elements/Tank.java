@@ -51,7 +51,7 @@ public class Tank {
     }
 
 
-    public void setDirection(Direction direction) {
+    public void setDirection(Direction direction)         {
         this.direction = direction;
         // Update the tank image based on the direction and type
         String suffix = type.equals("enemy") ? "2.gif" : ".gif"; // Enemy tanks have "2.gif"
@@ -90,6 +90,11 @@ public class Tank {
     public int getHealth() {
         return health;
     }
+
+    public MovementStrategy getMovementStrategy() {
+        return movementStrategy;
+    }
+
 
 
 }
