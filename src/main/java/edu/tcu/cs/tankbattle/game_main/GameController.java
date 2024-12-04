@@ -171,28 +171,25 @@ public class GameController {
         return playerTank;
     }
 
-    public void shootBullet(double startX, double startY, Direction direction) {
-        double tankWidth = playerTank.getImageView().getFitWidth();
-        double tankHeight = playerTank.getImageView().getFitHeight();
+    public void shootBullet(Direction direction) {
+        // Get tank dimensions
+        double tankWidth = playerTank.getImageView().getBoundsInParent().getWidth();
+        double tankHeight = playerTank.getImageView().getBoundsInParent().getHeight();
+
+        // Get tank position
+        double tankX = playerTank.getImageView().getX();
+        double tankY = playerTank.getImageView().getY();
 
         // Adjust bullet starting position based on tank center and direction
+        double bulletStartX = tankX + tankWidth / 2 - 5; // Center X (subtracting 5 assumes bullet width is 10)
+        double bulletStartY = tankY + tankHeight / 2 - 5; // Center Y (subtracting 5 assumes bullet height is 10)
+
+        // Adjust starting position based on direction
         switch (direction) {
-            case UP -> {
-                startX = playerTank.getImageView().getX() + tankWidth / 2 - 5; // Center X
-                startY = playerTank.getImageView().getY(); // Top edge
-            }
-            case DOWN -> {
-                startX = playerTank.getImageView().getX() + tankWidth / 2 - 5; // Center X
-                startY = playerTank.getImageView().getY() + tankHeight; // Bottom edge
-            }
-            case LEFT -> {
-                startX = playerTank.getImageView().getX(); // Left edge
-                startY = playerTank.getImageView().getY() + tankHeight / 2 - 5; // Center Y
-            }
-            case RIGHT -> {
-                startX = playerTank.getImageView().getX() + tankWidth; // Right edge
-                startY = playerTank.getImageView().getY() + tankHeight / 2 - 5; // Center Y
-            }
+            case UP -> bulletStartY = tankY; // Top edge of the tank
+            case DOWN -> bulletStartY = tankY + tankHeight; // Bottom edge
+            case LEFT -> bulletStartX = tankX; // Left edge of the tank
+            case RIGHT -> bulletStartX = tankX + tankWidth; // Right edge
         }
 
         // Select the correct bullet image based on direction
@@ -203,15 +200,15 @@ public class GameController {
             case RIGHT -> "/images/bulletR.gif";
         };
 
-        // Create a missile
-        Missile missile = new Missile(bulletImagePath, "player", startX, startY, 10);
+        // Create the missile
+        Missile missile = new Missile(bulletImagePath, "player", bulletStartX, bulletStartY, 10);
 
         // Set movement direction for the bullet
         switch (direction) {
-            case UP -> missile.setMovement(0, -1);
-            case DOWN -> missile.setMovement(0, 1);
-            case LEFT -> missile.setMovement(-1, 0);
-            case RIGHT -> missile.setMovement(1, 0);
+            case UP -> missile.setMovement(0, -1); // Move up
+            case DOWN -> missile.setMovement(0, 1); // Move down
+            case LEFT -> missile.setMovement(-1, 0); // Move left
+            case RIGHT -> missile.setMovement(1, 0); // Move right
         }
 
         // Add the missile to the game

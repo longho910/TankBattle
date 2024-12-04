@@ -38,8 +38,6 @@ public class Main extends Application {
                 }
                 case SPACE -> {
                     controller.shootBullet(
-                            playerTank.getImageView().getX(),
-                            playerTank.getImageView().getY(),
                             playerTank.getDirection()
                     );
                 }
