@@ -22,19 +22,19 @@ public class Main extends Application {
             switch (event.getCode()) {
                 case UP -> {
                     playerTank.setDirection(Direction.UP);
-                    playerTank.move(0, -1); // Move up
+                    playerTank.move(0, -1, controller.getWall()); // Move up
                 }
                 case DOWN -> {
                     playerTank.setDirection(Direction.DOWN);
-                    playerTank.move(0, 1); // Move down
+                    playerTank.move(0, 1, controller.getWall()); // Move down
                 }
                 case LEFT -> {
                     playerTank.setDirection(Direction.LEFT);
-                    playerTank.move(-1, 0); // Move left
+                    playerTank.move(-1, 0, controller.getWall()); // Move left
                 }
                 case RIGHT -> {
                     playerTank.setDirection(Direction.RIGHT);
-                    playerTank.move(1, 0); // Move right
+                    playerTank.move(1, 0, controller.getWall()); // Move right
                 }
                 case SPACE -> {
                     controller.shootBullet(
@@ -45,7 +45,7 @@ public class Main extends Application {
         });
 
 
-        primaryStage.setScene(scene);
+              primaryStage.setScene(scene);
         primaryStage.setTitle("Tank Battle Game");
         primaryStage.show();
     }

@@ -79,9 +79,44 @@ public class GameController {
 
     private void updateEnemyMovement() {
         for (Tank enemy : enemyTanks) {
-            enemy.move(0, 0); // Movement is handled by AIMovement strategy
+            double dx = 0, dy = 0;
+            boolean moved = false;
+
+            while (!moved) {
+                switch (enemy.getDirection()) {
+                    case UP -> dy = -1;
+                    case DOWN -> dy = 1;
+                    case LEFT -> dx = -1;
+                    case RIGHT -> dx = 1;
+                }
+
+                // Try to move the enemy tank and check for collisions
+                double nextX = enemy.getImageView().getX() + dx * enemy.getSpeed();
+                double nextY = enemy.getImageView().getY() + dy * enemy.getSpeed();
+                boolean collides = walls.stream().anyMatch(wall ->
+                        wall.getImageView().getBoundsInParent().intersects(
+                                nextX, nextY, enemy.getImageView().getFitWidth(), enemy.getImageView().getFitHeight()
+                        ));
+
+                if (!collides) {
+                    enemy.move(dx, dy, walls);
+                    moved = true;
+                } else {
+                    // If collision occurs, change direction randomly
+                    Direction newDirection = Direction.values()[(int) (Math.random() * Direction.values().length)];
+                    enemy.setDirection(newDirection);
+                    dx = 0;
+                    dy = 0; // Reset movement deltas
+                }
+            }
+
+            // Randomly decide to shoot
+            if (Math.random() < 0.05) { // 5% chance to shoot each frame
+                shootBullet(enemy.getDirection());
+            }
         }
     }
+
 
     private void handleExplosion(double x, double y, ImageView target, boolean isEnemy) {
         Explosion explosion = new Explosion(x, y);
@@ -171,40 +206,42 @@ public class GameController {
         return playerTank;
     }
 
-    public void shootBullet(Direction direction) {
+    public void shootBullet(Tank tank) {
         // Get tank dimensions
-        double tankWidth = playerTank.getImageView().getBoundsInParent().getWidth();
-        double tankHeight = playerTank.getImageView().getBoundsInParent().getHeight();
+        double tankWidth = tank.getImageView().getBoundsInParent().getWidth();
+        double tankHeight = tank.getImageView().getBoundsInParent().getHeight();
 
         // Get tank position
-        double tankX = playerTank.getImageView().getX();
-        double tankY = playerTank.getImageView().getY();
+        double tankX = tank.getImageView().getX();
+        double tankY = tank.getImageView().getY();
 
         // Adjust bullet starting position based on tank center and direction
         double bulletStartX = tankX + tankWidth / 2 - 5; // Center X (subtracting 5 assumes bullet width is 10)
         double bulletStartY = tankY + tankHeight / 2 - 5; // Center Y (subtracting 5 assumes bullet height is 10)
 
-        // Adjust starting position based on direction
-        switch (direction) {
-            case UP -> bulletStartY = tankY; // Top edge of the tank
+        switch (tank.getDirection()) {
+            case UP -> bulletStartY = tankY; // Top edge
             case DOWN -> bulletStartY = tankY + tankHeight; // Bottom edge
-            case LEFT -> bulletStartX = tankX; // Left edge of the tank
+            case LEFT -> bulletStartX = tankX; // Left edge
             case RIGHT -> bulletStartX = tankX + tankWidth; // Right edge
         }
 
         // Select the correct bullet image based on direction
-        String bulletImagePath = switch (direction) {
+        String bulletImagePath = switch (tank.getDirection()) {
             case UP -> "/images/bulletU.gif";
             case DOWN -> "/images/bulletD.gif";
             case LEFT -> "/images/bulletL.gif";
             case RIGHT -> "/images/bulletR.gif";
         };
 
+        // Determine missile type based on the tank type
+        String missileType = tank == playerTank ? "player" : "enemy";
+
         // Create the missile
-        Missile missile = new Missile(bulletImagePath, "player", bulletStartX, bulletStartY, 10);
+        Missile missile = new Missile(bulletImagePath, missileType, bulletStartX, bulletStartY, 10);
 
         // Set movement direction for the bullet
-        switch (direction) {
+        switch (tank.getDirection()) {
             case UP -> missile.setMovement(0, -1); // Move up
             case DOWN -> missile.setMovement(0, 1); // Move down
             case LEFT -> missile.setMovement(-1, 0); // Move left
@@ -218,6 +255,7 @@ public class GameController {
 
 
 
-
-
+    public List<Wall> getWall() {
+        return walls;
+    }
 }
