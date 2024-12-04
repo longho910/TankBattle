@@ -4,6 +4,8 @@ import edu.tcu.cs.tankbattle.strategies.MovementStrategy;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.util.List;
+
 public class Tank {
     private ImageView imageView;
     private int health;
@@ -26,9 +28,28 @@ public class Tank {
         this.type = type; // Type of tank (player or enemy)
     }
 
-    public void move(double dx, double dy) {
-        movementStrategy.move(this, dx * speed, dy * speed);
+    public void move(double dx, double dy, List<Wall> walls) {
+        // Calculate the tank's next position
+        double nextX = this.imageView.getX() + dx * this.speed;
+        double nextY = this.imageView.getY() + dy * this.speed;
+
+        // Simulate the movement to check for collisions
+        ImageView tempImageView = new ImageView(this.imageView.getImage());
+        tempImageView.setX(nextX);
+        tempImageView.setY(nextY);
+
+        // Check if the tank collides with any wall
+        boolean collides = walls.stream().anyMatch(wall ->
+                tempImageView.getBoundsInParent().intersects(wall.getImageView().getBoundsInParent())
+        );
+
+        // If no collision, update the tank's position
+        if (!collides) {
+            this.imageView.setX(nextX);
+            this.imageView.setY(nextY);
+        }
     }
+
 
     public void setDirection(Direction direction) {
         this.direction = direction;
