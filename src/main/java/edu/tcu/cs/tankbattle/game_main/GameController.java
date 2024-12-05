@@ -19,6 +19,8 @@ public class GameController {
     private List<Wall> walls = new ArrayList<>();
     private List<MedPack> medPacks = new ArrayList<>();
     private boolean gameStarted = false;
+    private AnimationTimer gameLoop;
+
 
 
     public GameController(Pane gamePane) {
@@ -66,15 +68,25 @@ public class GameController {
 
 
     public void startGameLoop() {
-        AnimationTimer gameLoop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                updateBullets(); // Update missiles
-                updateEnemyMovement(); // Move enemy tanks
-                checkCollisions(); // Check for collisions
-                checkGameStatus(); // Check win/lose conditions
-            }
-        };
+            gameLoop = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    try {
+                        if (!playerTank.isAlive()) {
+                            stopGame();
+                            return;
+                        }
+                        updateBullets();
+                        updateEnemyMovement();
+                        checkCollisions();
+                        checkGameStatus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        stopGame();
+                    }
+                }
+
+            };
         gameLoop.start();
     }
 
@@ -115,20 +127,26 @@ public class GameController {
         Explosion explosion = new Explosion(x, y);
         gamePane.getChildren().add(explosion.getImageView());
 
-        // Play explosion animation and remove the target and explosion after completion
         explosion.play(() -> {
-            System.out.println("Explosion finished. Removing target and explosion."); // Debug
-            gamePane.getChildren().remove(explosion.getImageView()); // Remove explosion
-            gamePane.getChildren().remove(target); // Remove target (enemy or wall)
+            gamePane.getChildren().remove(explosion.getImageView()); // Remove explosion after animation
+
             if (isEnemy) {
                 boolean removed = enemyTanks.removeIf(tank -> tank.getImageView() == target);
-                System.out.println("Enemy removed: " + removed); // Debug
+                if (removed) {
+                    System.out.println("Enemy tank removed.");
+                }
             } else {
                 boolean removed = walls.removeIf(wall -> wall.getImageView() == target);
-                System.out.println("Wall removed: " + removed); // Debug
+                if (removed) {
+                    System.out.println("Wall removed.");
+                }
             }
+
+            gamePane.getChildren().remove(target); // Remove the target
         });
     }
+
+
 
 
     private void checkCollisions() {
@@ -140,6 +158,8 @@ public class GameController {
                 for (Tank enemy : enemyTanks) {
                     if (missile.getImageView().getBoundsInParent().intersects(enemy.getImageView().getBoundsInParent())) {
                         enemy.takeDamage(25);
+                        handleExplosion(enemy.getImageView().getX(), enemy.getImageView().getY(), enemy.getImageView(), true);
+
                         if (!enemy.isAlive()) {
                             gamePane.getChildren().remove(enemy.getImageView()); // Remove enemy from game pane
                             enemyTanks.remove(enemy); // Remove enemy from list
@@ -154,12 +174,13 @@ public class GameController {
             if (missile.getType().equals("enemy")) {
                 if (missile.getImageView().getBoundsInParent().intersects(playerTank.getImageView().getBoundsInParent())) {
                     playerTank.takeDamage(25);
+                    handleExplosion(playerTank.getImageView().getX(), playerTank.getImageView().getY(), playerTank.getImageView(), false);
                     toRemove.add(missile); // Remove missile
                     if (!playerTank.isAlive()) {
                         gamePane.getChildren().remove(playerTank.getImageView()); // Remove player tank from game pane
-                        System.out.println("Game Over!");
                         stopGame();
-                    }
+                        return;
+                     }
                 }
             }
 
@@ -167,13 +188,15 @@ public class GameController {
             for (Wall wall : walls) {
                 if (missile.getImageView().getBoundsInParent().intersects(wall.getImageView().getBoundsInParent())) {
                     if (wall.isDestroyable()) {
+                        handleExplosion(wall.getImageView().getX(), wall.getImageView().getY(), wall.getImageView(), false);
                         gamePane.getChildren().remove(wall.getImageView()); // Remove wall from game pane
                         walls.remove(wall); // Remove wall from list
                     }
-                    toRemove.add(missile); // Remove missile
+                    toRemove.add(missile); // Remove missile after collision
                     break; // Stop checking other walls for this missile
                 }
             }
+
         }
 
         // Remove collided missiles
@@ -201,12 +224,15 @@ public class GameController {
 
     // Stops the game loop
     private void stopGame() {
-        AnimationTimer gameLoop = null; // Replace with a reference to your AnimationTimer instance
         if (gameLoop != null) {
             gameLoop.stop(); // Stop the game loop
+            gameLoop = null; // Nullify the reference to avoid accidental reuse
         }
+
+        System.out.println("Game Over!");
         System.exit(0); // Exit the game
     }
+
 
     public Tank getPlayerTank() {
         return playerTank;
